@@ -4,7 +4,7 @@ Aplikasi dashboard medis berbahasa Indonesia untuk memprediksi risiko mortalitas
 
 ## Alur 3 langkah (satu halaman, stepper)
 
-1. **Input SOAP** — 4 textarea (Subjective/Objective/Assessment/Plan) plus opsi tempel satu teks penuh. Tombol "Parsing dengan AI (DeepSeek)" dan "Isi Manual".
+1. **Input laporan** — SATU textarea besar saja: klinisi menempel laporan jaga apa adanya (gaya WhatsApp, S/O/A/P bercampur, ada tanda bintang, tabel lab, echo, dsb). Tombol "Parsing dengan AI (DeepSeek)" dan "Isi Manual". Ada contoh laporan untuk uji cepat.
 2. **Validasi & Koreksi** — form 13 field hasil parsing, semua bisa diedit. Field yang tidak ditemukan (null) ditandai kuning "belum ditemukan di SOAP — isi manual". Validasi rentang per field; Killip berupa dropdown 1/2/3. Tombol kirim nonaktif sampai semua valid. Ada tombol "Parsing Ulang".
 3. **Hasil** — kartu besar probabilitas (persen) dengan warna kategori (hijau/kuning/merah), label rawat, string threshold, rekomendasi dari API, kartu 3 kontributor teratas, dan bar chart SHAP 13 fitur (merah = memperberat, biru = meringankan) dengan garis referensi base value.
 
@@ -31,3 +31,13 @@ Tersimpan di localStorage: input 13 field + hasil + waktu. Daftar riwayat bisa d
 ## Yang perlu Anda siapkan
 
 Setelah plan disetujui, saya akan meminta **DEEPSEEK_API_KEY** lewat form aman (didapat dari platform.deepseek.com → API Keys). Fitur mode batch dan ekspor PDF belum termasuk — bisa ditambah kapan saja.
+
+## Aturan ekstraksi dari laporan bebas (contoh Anda)
+
+Prompt DeepSeek diperkuat untuk teks laporan nyata:
+
+- Ambil nilai **terbaru / saat di IGD PJT** jika ada lebih dari satu set (mis. lab RS perujuk vs lab PJT, EKG berulang, tensi).
+- Pemetaan: usia dari identitas (52 tahun), hr dari nadi/HR echo hemodinamik (97), sbp dari angka pertama tensi (141), rr dari nafas (24), hb (16.3), kalium dari K pada Na/K/Cl (4.4), ureum dari Ur pada Ur/Cr (30), egfr dari nilai eGFR yang tertulis (56), aptt dari PT/INR/APTT (23.7), lvef pilih EF biplane bila ada (38), lvot_vti (16), tapse dalam cm (2.2), killip dari teks diagnosis "KILLIP II" → 2.
+- Killip IV atau tidak jelas → null (form menolak angka 4, hanya 1/2/3).
+- TAPSE tertulis mm → dibagi 10.
+- Nilai yang tidak ada tetap null, tidak ditebak — user melengkapi di langkah validasi.
