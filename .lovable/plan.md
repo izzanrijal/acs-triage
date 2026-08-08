@@ -4,7 +4,7 @@ Aplikasi dashboard medis berbahasa Indonesia untuk memprediksi risiko mortalitas
 
 ## Alur 3 langkah (satu halaman, stepper)
 
-1. **Input SOAP** — 4 textarea (Subjective/Objective/Assessment/Plan) plus opsi tempel satu teks penuh. Tombol "Parsing dengan AI (DeepSeek)" dan "Isi Manual".
+1. **Input laporan** — SATU textarea besar saja: klinisi menempel laporan jaga apa adanya (gaya WhatsApp, S/O/A/P bercampur, ada tanda bintang, tabel lab, echo, dsb). Tombol "Parsing dengan AI (DeepSeek)" dan "Isi Manual". Ada contoh laporan untuk uji cepat.
 2. **Validasi & Koreksi** — form 13 field hasil parsing, semua bisa diedit. Field yang tidak ditemukan (null) ditandai kuning "belum ditemukan di SOAP — isi manual". Validasi rentang per field; Killip berupa dropdown 1/2/3. Tombol kirim nonaktif sampai semua valid. Ada tombol "Parsing Ulang".
 3. **Hasil** — kartu besar probabilitas (persen) dengan warna kategori (hijau/kuning/merah), label rawat, string threshold, rekomendasi dari API, kartu 3 kontributor teratas, dan bar chart SHAP 13 fitur (merah = memperberat, biru = meringankan) dengan garis referensi base value.
 
