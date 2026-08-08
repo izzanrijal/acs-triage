@@ -31,3 +31,13 @@ Tersimpan di localStorage: input 13 field + hasil + waktu. Daftar riwayat bisa d
 ## Yang perlu Anda siapkan
 
 Setelah plan disetujui, saya akan meminta **DEEPSEEK_API_KEY** lewat form aman (didapat dari platform.deepseek.com → API Keys). Fitur mode batch dan ekspor PDF belum termasuk — bisa ditambah kapan saja.
+
+## Aturan ekstraksi dari laporan bebas (contoh Anda)
+
+Prompt DeepSeek diperkuat untuk teks laporan nyata:
+
+- Ambil nilai **terbaru / saat di IGD PJT** jika ada lebih dari satu set (mis. lab RS perujuk vs lab PJT, EKG berulang, tensi).
+- Pemetaan: usia dari identitas (52 tahun), hr dari nadi/HR echo hemodinamik (97), sbp dari angka pertama tensi (141), rr dari nafas (24), hb (16.3), kalium dari K pada Na/K/Cl (4.4), ureum dari Ur pada Ur/Cr (30), egfr dari nilai eGFR yang tertulis (56), aptt dari PT/INR/APTT (23.7), lvef pilih EF biplane bila ada (38), lvot_vti (16), tapse dalam cm (2.2), killip dari teks diagnosis "KILLIP II" → 2.
+- Killip IV atau tidak jelas → null (form menolak angka 4, hanya 1/2/3).
+- TAPSE tertulis mm → dibagi 10.
+- Nilai yang tidak ada tetap null, tidak ditebak — user melengkapi di langkah validasi.
