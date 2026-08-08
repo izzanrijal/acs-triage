@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Activity, HeartPulse, ShieldAlert } from "lucide-react";
 import { getHealth, type ThresholdsResponse } from "@/lib/acs-api";
 
-export function AppHeader({ thresholds }: { thresholds?: ThresholdsResponse }) {
+export function AppHeader({ thresholds }: { thresholds?: ThresholdsResponse | undefined }) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["health"],
     queryFn: getHealth,

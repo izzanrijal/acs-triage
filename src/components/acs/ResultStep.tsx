@@ -7,7 +7,7 @@ import type { PredictResponse, ThresholdsResponse } from "@/lib/acs-api";
 
 interface Props {
   result: PredictResponse;
-  thresholds?: ThresholdsResponse;
+  thresholds?: ThresholdsResponse | undefined;
   onReset: () => void;
   onSave: () => void;
   saved: boolean;
