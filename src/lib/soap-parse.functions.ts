@@ -17,11 +17,14 @@ const ParsedSchema = z.object({
   lvot_vti: numOrNull,
   tapse: numOrNull,
   killip: numOrNull,
+  kreatinin: numOrNull,
+  jenis_kelamin: z.union([z.literal("L"), z.literal("P"), z.null()]).catch(null),
+  syok: z.union([z.boolean(), z.null()]).catch(null),
 });
 
 export type ParsedFeatures = z.infer<typeof ParsedSchema>;
 
-const SYSTEM_PROMPT = `Kamu adalah asisten dokter untuk ekstraksi data klinis. Dari laporan jaga / catatan SOAP pasien SKA (STEMI/NSTEMI) yang formatnya bebas (gaya WhatsApp, ada tanda bintang, singkatan, tabel lab, hasil echo), ekstrak 13 fitur berikut sebagai JSON dengan key persis: usia, hr, sbp, rr, hb, kalium, ureum, egfr, aptt, lvef, lvot_vti, tapse, killip.
+const SYSTEM_PROMPT = `Kamu adalah asisten dokter untuk ekstraksi data klinis. Dari laporan jaga / catatan SOAP pasien SKA (STEMI/NSTEMI) yang formatnya bebas (gaya WhatsApp, ada tanda bintang, singkatan, tabel lab, hasil echo), ekstrak JSON dengan key persis: usia, hr, sbp, rr, hb, kalium, ureum, egfr, aptt, lvef, lvot_vti, tapse, killip, kreatinin, jenis_kelamin, syok.
 
 Aturan:
 1. Jika nilai TIDAK disebutkan → null. JANGAN menebak atau mengarang nilai.
@@ -34,13 +37,16 @@ Aturan:
    - hb: hemoglobin / Hb (g/dL).
    - kalium: nilai K pada "Na/K/Cl" atau kalium (mEq/L).
    - ureum: nilai Ur pada "Ur/Cr" atau ureum (mg/dL).
-   - egfr: nilai eGFR bila tertulis. Jika hanya kreatinin yang ada tanpa eGFR → null.
+   - kreatinin: nilai Cr pada "Ur/Cr" atau kreatinin / creatinine (mg/dL).
+   - egfr: nilai eGFR bila tertulis. Jika hanya kreatinin yang ada tanpa eGFR → null (aplikasi akan menghitung sendiri).
    - aptt: nilai APTT pada "PT/INR/APTT" (detik).
    - lvef: EF dari echocardiography (%). Jika ada EF Teich dan EF Biplane, pilih BIPLANE.
    - lvot_vti: LVOT VTI (cm).
    - tapse: TAPSE dalam CM. Jika ditulis mm, bagi 10 (contoh: 22 mm → 2.2).
-   - killip: dari teks diagnosis, angka Romawi ikut dibaca ("KILLIP II" → 2). Hanya 1, 2, atau 3. Jika Killip IV atau tidak jelas → null.
-4. Perhatikan satuan: sistolik mmHg, hemoglobin g/dL, kalium mEq/L, ureum mg/dL, eGFR mL/mnt/1,73 m², aPTT detik, LVEF %, LVOT VTI cm, TAPSE cm, umur tahun.
+   - killip: dari teks diagnosis, angka Romawi ikut dibaca ("KILLIP II" → 2). Nilai 1, 2, 3, atau 4. Killip IV → 4. Jika tidak jelas → null.
+   - jenis_kelamin: "L" untuk laki-laki (Tn., Sdr., male), "P" untuk perempuan (Ny., Nn., female). Jika tidak jelas → null.
+   - syok: true bila laporan menyebut syok / shock / syok kardiogenik / cardiogenic shock aktif saat di IGD, atau pasien butuh vasopresor/inotropik karena syok. Jika tidak disebut → false.
+4. Perhatikan satuan: sistolik mmHg, hemoglobin g/dL, kalium mEq/L, ureum mg/dL, kreatinin mg/dL, eGFR mL/mnt/1,73 m², aPTT detik, LVEF %, LVOT VTI cm, TAPSE cm, umur tahun.
 5. Keluarkan HANYA JSON, tanpa teks lain.`;
 
 export const parseSoap = createServerFn({ method: "POST" })
@@ -102,7 +108,7 @@ export const parseSoap = createServerFn({ method: "POST" })
     }
 
     const features = parsed.data;
-    if (features.killip !== null && ![1, 2, 3].includes(Math.round(features.killip))) {
+    if (features.killip !== null && ![1, 2, 3, 4].includes(Math.round(features.killip))) {
       features.killip = null;
     }
 

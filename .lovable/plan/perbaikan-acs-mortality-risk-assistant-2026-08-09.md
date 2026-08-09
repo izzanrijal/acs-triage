@@ -1,5 +1,9 @@
 # Perbaikan ACS Mortality Risk Assistant
 
+&nbsp;
+
+setuju, namun threshold yang saya maksudkan disini bukan hanya resiko berapa persen, namun angka pastinya 0.xxxxx sehingga semua bisa nalar, oh ternyata lebih dari ambang sefety bla bla bla
+
 ## 1. Kriteria eksklusi di tahap validasi (Langkah 2)
 
 Tambahkan blok "Kriteria Eksklusi Penelitian" tepat di bawah field Tekanan Darah Sistolik:
@@ -8,6 +12,7 @@ Tambahkan blok "Kriteria Eksklusi Penelitian" tepat di bawah field Tekanan Darah
 - **Killip**: dropdown diperluas menjadi Killip I, II, III, dan **IV**
 
 Jika salah satu dicentang/dipilih (syok = ya, atau Killip IV):
+
 - Tombol prediksi dinonaktifkan
 - Muncul panel merah: "Pasien termasuk kriteria eksklusi penelitian (syok kardiogenik / Killip IV). Model tidak dapat digunakan pada populasi ini."
 - Tersedia tombol "Mulai Pasien Baru" untuk keluar dari alur
@@ -15,6 +20,7 @@ Jika salah satu dicentang/dipilih (syok = ya, atau Killip IV):
 ## 2. Validasi wajib lengkap
 
 Tombol "Kirim untuk Prediksi" hanya aktif jika seluruh 13 parameter terisi dan berada dalam rentang valid. Bila belum lengkap:
+
 - Tombol tetap nonaktif
 - Ringkasan di atas tombol: "3 parameter belum lengkap: eGFR, TAPSE, LVOT VTI"
 - Menekan area tombol menyorot (scroll + fokus) field pertama yang bermasalah
@@ -22,6 +28,7 @@ Tombol "Kirim untuk Prediksi" hanya aktif jika seluruh 13 parameter terisi dan b
 ## 3. eGFR otomatis (CKD-EPI 2021 Creatinine)
 
 Formula CKD-EPI 2021 butuh **kreatinin, usia, dan jenis kelamin**, jadi:
+
 - Parsing AI ditambah dua field baru: `kreatinin` (mg/dL) dan `jenis_kelamin` (L/P) — keduanya bukan input model, hanya pembantu
 - Jika eGFR tidak ditemukan tetapi kreatinin + usia + jenis kelamin tersedia → eGFR dihitung otomatis dan field diberi tanda biru "Dihitung otomatis dari kreatinin (CKD-EPI 2021)" beserta nilai kreatinin yang dipakai
 - Nilai hasil hitung tetap bisa ditimpa manual oleh dokter
@@ -35,6 +42,7 @@ Tombol "Prediksi Baru" / "Mulai Pasien Baru" membersihkan seluruh state: teks SO
 ## 5. Nilai threshold eksplisit di hasil
 
 Panel hasil menampilkan angka pasti, bukan hanya rentang:
+
 - Ambang keputusan aktif: **safety = x,xxx (x,x%)** dan **youden = y,yyy (y,y%)**
 - Baris "Probabilitas pasien x,x% vs ambang safety x,x% → di atas/di bawah ambang"
 - Tabel tier menampilkan rentang numerik beserta penanda tier mana yang sedang aktif
@@ -42,7 +50,7 @@ Panel hasil menampilkan angka pasti, bukan hanya rentang:
 
 ## 6. Atribusi tesis di footer
 
-Footer diperbarui: nama peneliti **dr. Izzan Rijal Muslim, et al.** dan judul tesis lengkap "MODEL RANDOM FOREST UNTUK PREDIKSI MORTALITAS IN-HOSPITAL PADA PASIEN INFARK MIOKARD DENGAN ELEVASI SEGMEN ST (STEMI) DAN TANPA ELEVASI SEGMEN ST (NSTEMI) DI INSTALASI GAWAT DARURAT", di atas disclaimer klinis yang sudah ada.
+Footer diperbarui: nama peneliti **Izzan Rijal Muslim, et al.** dan judul tesis lengkap "MODEL RANDOM FOREST UNTUK PREDIKSI MORTALITAS IN-HOSPITAL PADA PASIEN INFARK MIOKARD DENGAN ELEVASI SEGMEN ST (STEMI) DAN TANPA ELEVASI SEGMEN ST (NSTEMI) DI INSTALASI GAWAT DARURAT", di atas disclaimer klinis yang sudah ada.
 
 ## 7. Peningkatan UX & responsivitas
 
