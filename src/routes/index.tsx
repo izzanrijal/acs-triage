@@ -152,21 +152,26 @@ function Beranda() {
     if (value !== null) setMissing((prev) => prev.filter((k) => k !== key));
   }, []);
 
-  const handleHelperChange = useCallback((patch: Partial<HelperValues>) => {
-    setHelpers((prev) => {
-      const next = { ...prev, ...patch };
-      setValues((v) => {
-        const perluHitung = v.egfr == null || egfrAuto;
-        if (!perluHitung) return v;
-        const hitung = calculateEgfr2021(next.kreatinin, v.usia ?? null, next.jenisKelamin ?? null);
-        if (hitung == null) return v;
-        setEgfrAuto(true);
-        setMissing((m) => m.filter((k) => k !== "egfr"));
-        return { ...v, egfr: hitung };
-      });
-      return next;
-    });
-  }, [egfrAuto]);
+  const handleHelperChange = useCallback(
+    (patch: Partial<HelperValues>) => {
+      const next = { ...helpers, ...patch };
+      setHelpers(next);
+      if (values.egfr == null || egfrAuto) {
+        const hitung = calculateEgfr2021(
+          next.kreatinin,
+          values.usia ?? null,
+          next.jenisKelamin ?? null,
+        );
+        if (hitung != null) {
+          setValues((v) => ({ ...v, egfr: hitung }));
+          setEgfrAuto(true);
+          setMissing((m) => m.filter((k) => k !== "egfr"));
+        }
+      }
+    },
+    [helpers, values.egfr, values.usia, egfrAuto],
+  );
+
 
   const handleNewPatient = () => {
     resetPatientState();
