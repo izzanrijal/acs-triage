@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Check } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -217,39 +218,49 @@ function Beranda() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-surface">
       <AppHeader thresholds={thresholds} />
 
-      <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <ol className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 text-sm sm:gap-3 sm:px-6">
-          {langkah.map((l, i) => (
-            <li key={l.n} className="flex min-w-0 items-center gap-2">
-              <span
-                className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-                  step === l.n
-                    ? "bg-primary text-primary-foreground"
-                    : step > l.n
-                      ? "bg-primary/15 text-primary"
-                      : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {l.n}
-              </span>
-              <span
-                className={`truncate ${
-                  step === l.n
-                    ? "font-medium text-foreground"
-                    : "hidden text-muted-foreground sm:inline"
-                }`}
-              >
-                {l.label}
-              </span>
-              {i < langkah.length - 1 && (
-                <span className="hidden text-muted-foreground sm:inline">›</span>
-              )}
-            </li>
-          ))}
-        </ol>
+      <div className="sticky top-0 z-30 bg-surface-container/95 backdrop-blur supports-[backdrop-filter]:bg-surface-container/85">
+        <nav
+          aria-label="Langkah alur prediksi"
+          className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:px-6"
+        >
+          {langkah.map((l, i) => {
+            const aktif = step === l.n;
+            const selesai = step > l.n;
+            return (
+              <div key={l.n} className="flex min-w-0 flex-1 items-center gap-2">
+                <div
+                  className={`flex min-w-0 items-center gap-2 rounded-full px-3 py-1.5 transition-colors duration-200 ease-m3-emphasized ${
+                    aktif
+                      ? "bg-primary text-on-primary"
+                      : selesai
+                        ? "bg-primary-container text-on-primary-container"
+                        : "bg-surface-container-high text-on-surface-variant"
+                  }`}
+                >
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-surface/25 text-xs font-semibold">
+                    {selesai ? <Check className="size-3.5" aria-hidden /> : l.n}
+                  </span>
+                  <span
+                    className={`m3-label-large truncate ${aktif ? "" : "hidden sm:inline"}`}
+                  >
+                    {l.label}
+                  </span>
+                </div>
+                {i < langkah.length - 1 && (
+                  <span
+                    aria-hidden
+                    className={`h-1 flex-1 rounded-full ${
+                      selesai ? "bg-primary" : "bg-surface-container-highest"
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </nav>
       </div>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
@@ -303,10 +314,10 @@ function Beranda() {
         </div>
       </main>
 
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto max-w-6xl space-y-3 px-4 py-6 text-xs text-muted-foreground sm:px-6">
+      <footer className="mt-8 bg-surface-container">
+        <div className="mx-auto max-w-6xl space-y-3 px-4 py-8 text-xs text-on-surface-variant sm:px-6">
           <div className="space-y-1">
-            <p className="font-medium text-foreground">
+            <p className="m3-title-medium text-on-surface">
               Model dikembangkan dari tesis Izzan Rijal Muslim, et al.
             </p>
             <p className="uppercase leading-relaxed tracking-wide">
@@ -315,7 +326,7 @@ function Beranda() {
               Gawat Darurat”
             </p>
           </div>
-          <p className="border-t border-border pt-3">
+          <p className="rounded-m3-lg bg-surface-container-high px-4 py-3">
             Alat bantu keputusan klinis — bukan pengganti penilaian dokter. Prediksi berbasis model
             statistik; keputusan akhir tetap pada klinisi.
           </p>
