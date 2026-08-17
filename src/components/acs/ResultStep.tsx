@@ -1,7 +1,6 @@
 import { RotateCcw, Save, TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ShapChart } from "./ShapChart";
 import type { PredictResponse, ThresholdsResponse } from "@/lib/acs-api";
 
@@ -13,11 +12,12 @@ interface Props {
   saved: boolean;
 }
 
-function riskClasses(category: string) {
+function riskContainer(category: string) {
   const c = category.toUpperCase();
-  if (c.includes("HIGH")) return "bg-risk-high/10 text-risk-high border-risk-high/40";
-  if (c.includes("INTERMEDIATE")) return "bg-risk-medium/10 text-risk-medium border-risk-medium/40";
-  return "bg-risk-low/10 text-risk-low border-risk-low/40";
+  if (c.includes("HIGH")) return "bg-risk-high-container text-on-risk-high-container";
+  if (c.includes("INTERMEDIATE"))
+    return "bg-risk-medium-container text-on-risk-medium-container";
+  return "bg-risk-low-container text-on-risk-low-container";
 }
 
 export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props) {
@@ -27,41 +27,46 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
 
   return (
     <div className="space-y-6">
-      <Card className={`border-2 shadow-sm ${riskClasses(result.risk_category)}`}>
-        <CardContent className="grid gap-6 pt-6 md:grid-cols-[minmax(0,220px)_1fr] md:items-center">
-          <div className="min-w-0 text-center md:text-left">
-            <p className="text-sm font-medium opacity-80">Probabilitas mortalitas in-hospital</p>
-            <p className="mt-1 text-5xl font-bold leading-none tabular-nums sm:text-6xl">
-              {persen}%
-            </p>
+      <section
+        className={`rounded-m3-xxl px-6 py-8 ${riskContainer(result.risk_category)}`}
+        aria-label="Ringkasan risiko"
+      >
+        <div className="grid gap-8 md:grid-cols-[minmax(0,260px)_1fr] md:items-center">
+          <div className="min-w-0">
+            <p className="m3-label-large opacity-80">Probabilitas mortalitas in-hospital</p>
+            <p className="m3-display-large mt-2 tabular-nums">{persen}%</p>
             <p className="mt-1 font-mono text-sm opacity-80">p = {p.toFixed(6)}</p>
-            <p className="mt-2 text-lg font-semibold">{result.risk_category}</p>
+            <span className="mt-4 inline-flex rounded-full bg-surface/70 px-3 py-1 text-sm font-semibold text-on-surface">
+              {result.risk_category}
+            </span>
           </div>
           <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm opacity-80">Label rawat:</span>
-              <Badge variant="outline" className="border-current text-base font-semibold">
+              <span className="rounded-full bg-surface px-4 py-1.5 text-base font-semibold text-on-surface">
                 {result.label}
-              </Badge>
-              <span className="rounded bg-background/60 px-2 py-0.5 font-mono text-xs">
+              </span>
+              <span className="rounded-full bg-surface/60 px-3 py-1 font-mono text-xs text-on-surface">
                 {result.thresholds}
               </span>
             </div>
-            <div className="rounded-md bg-background/70 p-3 text-sm text-foreground">
-              <p className="font-medium">Rekomendasi</p>
-              <p className="mt-1 text-muted-foreground">{result.recommendation}</p>
+            <div className="rounded-m3-lg bg-surface p-4 text-sm text-on-surface">
+              <p className="m3-title-medium">Rekomendasi</p>
+              <p className="mt-1 text-on-surface-variant">{result.recommendation}</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {thresholds && (
-        <Card className="border-border/70 shadow-sm">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Perbandingan dengan Ambang Keputusan</CardTitle>
-            <CardDescription className="text-xs">{thresholds.source}</CardDescription>
+            <CardTitle className="m3-title-medium">Perbandingan dengan Ambang Keputusan</CardTitle>
+            <CardDescription className="text-xs text-on-surface-variant">
+              {thresholds.source}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="space-y-4 text-sm">
             <div className="grid gap-3 sm:grid-cols-2">
               {(
                 [
@@ -71,20 +76,22 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
               ).map((t) => {
                 const diatas = p >= t.nilai;
                 return (
-                  <div key={t.nama} className="rounded-md border border-border p-3">
-                    <p className="text-xs text-muted-foreground">{t.nama}</p>
-                    <p className="font-mono text-lg font-semibold tabular-nums">
+                  <div key={t.nama} className="rounded-m3-lg bg-surface-container-high p-4">
+                    <p className="text-xs text-on-surface-variant">{t.nama}</p>
+                    <p className="font-mono text-lg font-semibold tabular-nums text-on-surface">
                       {t.nilai.toFixed(6)}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-on-surface-variant">
                       ≈ {(t.nilai * 100).toFixed(2)}% probabilitas
                     </p>
                     <p
-                      className={`mt-1 text-xs font-medium ${
-                        diatas ? "text-risk-high" : "text-risk-low"
+                      className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                        diatas
+                          ? "bg-risk-high-container text-on-risk-high-container"
+                          : "bg-risk-low-container text-on-risk-low-container"
                       }`}
                     >
-                      p pasien {p.toFixed(6)} {diatas ? "≥" : "<"} {t.nilai.toFixed(6)} →{" "}
+                      p {p.toFixed(6)} {diatas ? "≥" : "<"} {t.nilai.toFixed(6)} →{" "}
                       {diatas ? "di atas ambang" : "di bawah ambang"}
                     </p>
                   </div>
@@ -92,19 +99,21 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
               })}
             </div>
 
-            <div className="space-y-2 border-t border-border pt-3">
+            <div className="space-y-1.5">
               {thresholds.tiers.map((t) => {
                 const aktif = t.risk_category.toUpperCase() === result.risk_category.toUpperCase();
                 return (
                   <div
                     key={t.risk_category}
-                    className={`flex flex-wrap items-center justify-between gap-2 rounded-md px-2 py-1.5 ${
-                      aktif ? "bg-primary/10 font-medium text-foreground" : "text-muted-foreground"
+                    className={`flex flex-wrap items-center justify-between gap-2 rounded-full px-4 py-2 ${
+                      aktif
+                        ? "bg-primary-container font-medium text-on-primary-container"
+                        : "bg-surface-container text-on-surface-variant"
                     }`}
                   >
                     <span>
                       {t.risk_category} · {t.label}
-                      {aktif && <span className="ml-2 text-xs text-primary">(tier pasien ini)</span>}
+                      {aktif && <span className="ml-2 text-xs">(tier pasien ini)</span>}
                     </span>
                     <span className="font-mono text-xs">{t.range}</span>
                   </div>
@@ -116,10 +125,10 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
       )}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
-        <Card className="min-w-0 border-border/70 shadow-sm">
+        <Card className="min-w-0">
           <CardHeader>
-            <CardTitle className="text-base">Kontribusi Fitur (SHAP)</CardTitle>
-            <CardDescription>
+            <CardTitle className="m3-title-medium">Kontribusi Fitur (SHAP)</CardTitle>
+            <CardDescription className="text-on-surface-variant">
               Merah = memperberat risiko, hijau = meringankan. Probabilitas dasar (base value) ={" "}
               <span className="font-mono">{(base * 100).toFixed(2)}%</span>.
             </CardDescription>
@@ -132,9 +141,9 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
         </Card>
 
         <div className="min-w-0 space-y-6">
-          <Card className="border-border/70 shadow-sm">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-base">3 Kontributor Teratas</CardTitle>
+              <CardTitle className="m3-title-medium">3 Kontributor Teratas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {result.contributors_top3.map((c) => {
@@ -142,7 +151,7 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
                 return (
                   <div
                     key={c.name}
-                    className="flex items-start gap-3 rounded-md border border-border/70 p-3"
+                    className="flex items-start gap-3 rounded-m3-lg bg-surface-container-high p-4"
                   >
                     {naik ? (
                       <TrendingUp className="mt-0.5 size-4 shrink-0 text-risk-high" aria-hidden />
@@ -150,10 +159,10 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
                       <TrendingDown className="mt-0.5 size-4 shrink-0 text-risk-low" aria-hidden />
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium text-on-surface">
                         {c.name} = {c.value}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-on-surface-variant">
                         {naik ? "Memperberat" : "Meringankan"} risiko sebesar{" "}
                         <span className="font-mono">
                           {(Math.abs(c.shap_contribution) * 100).toFixed(2)} poin persen
@@ -173,7 +182,7 @@ export function ResultStep({ result, thresholds, onReset, onSave, saved }: Props
           <RotateCcw className="size-4" aria-hidden /> Prediksi Pasien Baru
         </Button>
         <Button
-          variant="outline"
+          variant="tonal"
           size="lg"
           onClick={onSave}
           disabled={saved}
