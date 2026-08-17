@@ -75,17 +75,17 @@ export function FeatureFormStep({
     const describedBy = `${def.key}-desc`;
 
     const stateClass = missing
-      ? "border-warning bg-warning/10"
+      ? "border-risk-medium bg-risk-medium-container/50"
       : err
-        ? "border-destructive/60"
+        ? "border-error bg-error-container/40"
         : auto
-          ? "border-primary/50 bg-primary/5"
+          ? "border-primary bg-primary-container/40"
           : undefined;
 
     return (
       <div key={def.key} className="min-w-0 space-y-1.5">
-        <Label htmlFor={def.key} className="text-sm font-medium">
-          {def.label} <span className="font-normal text-muted-foreground">({def.unit})</span>
+        <Label htmlFor={def.key} className="m3-label-large text-on-surface">
+          {def.label} <span className="font-normal text-on-surface-variant">({def.unit})</span>
         </Label>
 
         {def.key === "killip" ? (
@@ -96,7 +96,7 @@ export function FeatureFormStep({
             <SelectTrigger
               id={def.key}
               aria-describedby={describedBy}
-              className={value === 4 ? "border-destructive bg-destructive/10" : stateClass}
+              className={value === 4 ? "border-error bg-error-container/50" : stateClass}
             >
               <SelectValue placeholder="Pilih kelas" />
             </SelectTrigger>
@@ -127,18 +127,18 @@ export function FeatureFormStep({
 
         <p id={describedBy} className="text-xs">
           {missing ? (
-            <span className="text-warning">Tidak ditemukan di laporan — isi manual</span>
+            <span className="text-on-risk-medium-container">Tidak ditemukan di laporan — isi manual</span>
           ) : err ? (
-            <span className="text-destructive">{err}</span>
+            <span className="text-error">{err}</span>
           ) : auto ? (
             <span className="inline-flex items-center gap-1 text-primary">
               <Calculator className="size-3" aria-hidden /> Dihitung otomatis dari kreatinin{" "}
               {helpers.kreatinin} mg/dL (CKD-EPI 2021)
             </span>
           ) : def.hint ? (
-            <span className="text-muted-foreground">{def.hint}</span>
+            <span className="text-on-surface-variant">{def.hint}</span>
           ) : (
-            <span className="text-muted-foreground">
+            <span className="text-on-surface-variant">
               Rentang {def.min}–{def.max}
             </span>
           )}
@@ -149,21 +149,23 @@ export function FeatureFormStep({
 
   return (
     <div className="space-y-5" ref={formRef}>
-      <Card className="border-border/70 shadow-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-            <Stethoscope className="size-5 shrink-0 text-primary" aria-hidden />
+          <CardTitle className="m3-headline-small flex items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-m3-md bg-primary-container text-on-primary-container">
+              <Stethoscope className="size-5" aria-hidden />
+            </span>
             Langkah 2 — Validasi &amp; Koreksi Data
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="m3-body-medium text-on-surface-variant">
             Periksa setiap nilai hasil ekstraksi. Anda bertanggung jawab memastikan data benar
             sebelum prediksi dijalankan.
           </CardDescription>
         </CardHeader>
         {jumlahKosong > 0 && (
           <CardContent>
-            <div className="flex items-start gap-2 rounded-md border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning-foreground">
-              <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden />
+            <div className="flex items-start gap-3 rounded-m3-lg bg-risk-medium-container px-4 py-3 text-sm text-on-risk-medium-container">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
               <span>
                 {jumlahKosong} parameter tidak ditemukan di laporan dan ditandai kuning. Mohon
                 dilengkapi secara manual.
@@ -174,12 +176,12 @@ export function FeatureFormStep({
       </Card>
 
       {FEATURE_GROUPS.map((g) => (
-        <Card key={g.id} className="border-border/70 shadow-sm">
+        <Card key={g.id}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <CardTitle className="m3-label-large uppercase tracking-wider text-primary">
               {g.title}
             </CardTitle>
-            <CardDescription className="text-xs">{g.description}</CardDescription>
+            <CardDescription className="text-xs text-on-surface-variant">{g.description}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -187,8 +189,8 @@ export function FeatureFormStep({
             </div>
 
             {g.id === "vital" && (
-              <div className="rounded-lg border border-border bg-muted/40 p-4">
-                <p className="text-sm font-medium">Kriteria Eksklusi Penelitian</p>
+              <div className="rounded-m3-lg bg-surface-container-high p-4">
+                <p className="m3-title-medium">Kriteria Eksklusi Penelitian</p>
                 <label className="mt-3 flex items-start gap-3 text-sm">
                   <Checkbox
                     checked={helpers.syok === true}
@@ -198,7 +200,7 @@ export function FeatureFormStep({
                   />
                   <span>
                     Syok saat di IGD
-                    <span className="block text-xs text-muted-foreground">
+                    <span className="block text-xs text-on-surface-variant">
                       Syok kardiogenik / butuh vasopresor saat tiba di IGD
                     </span>
                   </span>
@@ -207,7 +209,7 @@ export function FeatureFormStep({
             )}
 
             {g.id === "lab" && (
-              <div className="grid gap-4 rounded-lg border border-border bg-muted/40 p-4 sm:grid-cols-2">
+              <div className="grid gap-4 rounded-m3-lg bg-surface-container-high p-4 sm:grid-cols-2">
                 <div className="min-w-0 space-y-1.5">
                   <Label htmlFor="kreatinin" className="text-sm font-medium">
                     Kreatinin <span className="font-normal text-muted-foreground">(mg/dL)</span>
@@ -226,7 +228,7 @@ export function FeatureFormStep({
                       })
                     }
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-on-surface-variant">
                     Bukan input model — hanya untuk menghitung eGFR
                   </p>
                 </div>
@@ -246,7 +248,7 @@ export function FeatureFormStep({
                       <SelectItem value="P">Perempuan</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-on-surface-variant">
                     Diperlukan formula CKD-EPI 2021 bila eGFR dihitung otomatis
                   </p>
                 </div>
@@ -257,7 +259,7 @@ export function FeatureFormStep({
       ))}
 
       {excluded && (
-        <div className="flex items-start gap-3 rounded-lg border-2 border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+        <div className="flex items-start gap-3 rounded-m3-xl bg-error-container p-5 text-sm text-on-error-container">
           <Ban className="mt-0.5 size-5 shrink-0" aria-hidden />
           <div className="space-y-3">
             <p className="font-semibold">
@@ -272,15 +274,15 @@ export function FeatureFormStep({
       )}
 
       {error && (
-        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="rounded-m3-lg bg-error-container px-4 py-3 text-sm text-on-error-container">
           {error}
         </div>
       )}
 
-      <div className="space-y-3 rounded-lg border border-border bg-card p-4">
+      <div className="sticky bottom-4 space-y-3 rounded-m3-xl bg-surface-container-high p-4 m3-elevation-2">
         {!isValid && !excluded && (
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{belum.length} parameter</span> belum
+          <p className="text-sm text-on-surface-variant">
+            <span className="font-medium text-on-surface">{belum.length} parameter</span> belum
             lengkap: {belum.join(", ")}
           </p>
         )}
@@ -308,7 +310,7 @@ export function FeatureFormStep({
             </Button>
           )}
           <Button
-            variant="outline"
+            variant="tonal"
             size="lg"
             onClick={onBack}
             disabled={isPredicting}
